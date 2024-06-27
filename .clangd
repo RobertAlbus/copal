@@ -1,0 +1,8 @@
+Diagnostics:
+  Suppress:
+    - misc-unused-alias-decls
+  UnusedIncludes: None
+  Includes:
+    IgnoreHeader:
+        - concepts
+        - type_traits

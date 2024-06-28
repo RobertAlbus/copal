@@ -29,17 +29,13 @@ T sin_lookup(T xIn) {
   auto [x, sign] = angle_normalization_pi_over_2(xIn);
 
   T index_f = x * (lut::max_index);
-  T index_A = static_cast<size_t>(index_f);
+  size_t index_A = static_cast<size_t>(index_f);
 
-  // if constexpr (std::is_same_v<T, float>) {
-  //     // do not use lerp for single precision float.
-  //     // precision in table size 2048 for [0..0.25 pi] 
-  //     // is same as rounding error
-  //     return sign * copal::lut::get<T>()[index_A];
-  // }
+  if (index_A > copal::lut::max_index) {
+    return copal::lut::get<T>()[index_A];
+  }
 
-  // TODO: bounds checking for (A < maxIndex - 1)
-  T index_B = index_A + T(1);
+  size_t index_B = index_A + 1;
   T lerpAmount = index_f - index_A;
 
   return sign * lerp(

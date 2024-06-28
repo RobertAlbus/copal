@@ -10,9 +10,8 @@
 namespace copal::scalar {
 
 template<std::floating_point T>
-T sin_taylor(T x) {
-  T sign = T(1);
-  angle_normalization_pi_over_2(x, sign);
+T sin_taylor(T xIn) {
+  auto [x, sign] = angle_normalization_pi_over_2(xIn);
   T term = x;
   T sum = term;
 
@@ -26,9 +25,8 @@ T sin_taylor(T x) {
 }
 
 template<std::floating_point T>
-T sin_lookup(T x) {
-  T sign = T(1);
-  angle_normalization_pi_over_2(x, sign);
+T sin_lookup(T xIn) {
+  auto [x, sign] = angle_normalization_pi_over_2(xIn);
 
   T index_f = x * (lut::max_index);
   T index_A = static_cast<size_t>(index_f);

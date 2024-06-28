@@ -52,12 +52,12 @@ T floor(T x) {
 }
 
 template<std::floating_point T>
-void angle_normalization_pi_over_2(T& x, T& sign_out) {
+std::pair<T, T>  angle_normalization_pi_over_2(T x) {
     constexpr T halfPi = std::numbers::pi_v<T> * T(0.5);
     constexpr T pi = std::numbers::pi_v<T>;
     constexpr T twoPi = std::numbers::pi_v<T> * T(2);
 
-    sign_out = 1;
+    T sign = 1;
     if (x > twoPi || x < -twoPi) {
           x = fmod(x, twoPi);
     }
@@ -65,9 +65,11 @@ void angle_normalization_pi_over_2(T& x, T& sign_out) {
     if (x < 0) x += twoPi;
     if (x > pi) {
         x -= pi;
-        sign_out = T(-1);
+        sign = -1;
     }
     if (x > halfPi) x = pi - x;
+
+    return {x, sign};
 }
 
 }

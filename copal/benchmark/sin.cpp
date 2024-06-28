@@ -15,6 +15,7 @@
 // ----
 // headers
 #include "scalar/sin.hpp"
+#include "sin_lut.hpp"
 #include "stdlib/sin.hpp"
 #include "vector_impl/sin.hpp"
 #include "vector_stdx/sin.hpp"
@@ -119,7 +120,7 @@ BENCHMARK(BM_copal_stdlib_sin_stdlib<pi_params<float, 16, 1>>);
 // --------------------------------
 // benchmarks : simd
 
-#define BM_define_copal_simd(impl_name, impl)\
+#define BM_define_copal_simd(impl_name, impl)               \
 template<typename params>                                   \
 static void BM_copal_##impl_name(benchmark::State& state) { \
   using T = params::Type;                                   \
@@ -128,8 +129,16 @@ static void BM_copal_##impl_name(benchmark::State& state) { \
   aligned_array(T, testInputSize) x_out;                    \
                                                             \
   for (auto _ : state) {                                    \
-    impl(&(x_in[0]), &(x_out[0]), testInputSize);           \
-  }                                                         \
+    stdx::native_simd<T>* simd_x     = reinterpret_cast<stdx::native_simd<T>*>(&(x_in[0])); \
+    stdx::native_simd<T>* simd_x_out = reinterpret_cast<stdx::native_simd<T>*>(&(x_out[0]));\
+                                                                      \
+    const std::size_t size = stdx::native_simd<T>::size();            \
+    for(std::size_t i = 0; i + size <= copal::lut::size; i += size) { \
+      size_t idx = i / size;                                          \
+      stdx::native_simd<T> chunk_x = simd_x[idx];                     \
+      benchmark::DoNotOptimize(simd_x_out[idx] = impl(chunk_x));      \
+    }                                                                 \
+  }                                                                   \
 }
 
 BM_define_copal_simd(vector_impl_sin_lookup, copal::vector_impl::sin_lookup)

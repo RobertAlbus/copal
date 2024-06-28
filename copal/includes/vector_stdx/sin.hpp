@@ -82,17 +82,4 @@ stdx::native_simd<T> sin_lookup(const stdx::native_simd<T>& xInput) {
   return lerp(val_A, val_B, lerpAmount);
 }
 
-template<std::floating_point T>
-void sin_lookup(T* x_input, T* x_output, size_t n) {
-  stdx::native_simd<T>* simd_x     = reinterpret_cast<stdx::native_simd<T>*>(x_input);
-  stdx::native_simd<T>* simd_x_out = reinterpret_cast<stdx::native_simd<T>*>(x_output);
-  
-  const std::size_t size = stdx::native_simd<T>::size();
-  for(std::size_t i = 0; i + size <= n; i += size) {
-    size_t idx = i / size;
-    stdx::native_simd<T> chunk_x = simd_x[idx];
-    benchmark::DoNotOptimize(simd_x_out[idx] = sin_lookup(chunk_x));
-  }
-}
-
 }

@@ -65,10 +65,30 @@ TYPED_TEST(CopalTest, lerp) {
   for (auto pair : lerpPairs) {
     auto [a, b] = pair;
     for (auto lerpValue : this->fixture_min_max()) {
-      T LerpScalar = copal::scalar::lerp<T>(a, b, lerpValue);
-      T LerpStdlib = copal::stdlib::lerp<T>(a, b, lerpValue);
-      
-      EXPECT_FLOAT_EQ(LerpScalar, LerpStdlib);
+      T lerpScalar = copal::scalar::lerp<T>(a, b, lerpValue);
+      T lerpStdlib = copal::stdlib::lerp<T>(a, b, lerpValue);
+
+      EXPECT_FLOAT_EQ(lerpScalar, lerpStdlib);
+    }
+  }
+}
+
+TYPED_TEST(CopalTest, lerp_by_initity) {
+  using T = TypeParam;
+
+  for (auto lerpValue : this->fixture_min_max()) {
+    T inf  = std::numeric_limits<T>::infinity();
+    T ninf = -inf;
+
+    for (auto val : {inf, ninf}) {
+      EXPECT_EQ(val,  copal::scalar::lerp<T>( 1,    2,    val ));
+      EXPECT_EQ(val,  copal::scalar::lerp<T>( val,  2,    1   ));
+      EXPECT_EQ(val,  copal::scalar::lerp<T>( 1,    val,  1   ));
+      EXPECT_EQ(inf,  copal::scalar::lerp<T>( val,  val,  1   ));
+      EXPECT_EQ(val,  copal::scalar::lerp<T>( val,  val,  val ));
+      EXPECT_EQ(-val, copal::scalar::lerp<T>( val,  val, -val ));
+      EXPECT_EQ(ninf, copal::scalar::lerp<T>( val, -val,  1   ));
+      EXPECT_EQ(ninf, copal::scalar::lerp<T>( val,  2,   -val ));
     }
   }
 }

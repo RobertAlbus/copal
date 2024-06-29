@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <concepts>
 #include <numbers>
 #include <type_traits>
@@ -34,6 +35,8 @@ T fmod(T a, T b) {
 
 template<std::floating_point T>
 T lerp(T a, T b, T lerp) {
+  if (std::isinf(a) || std::isinf(b) || std::isinf(lerp))
+    return a*b*lerp;
   return (T(1) - lerp) * a + lerp * b;
 }
 

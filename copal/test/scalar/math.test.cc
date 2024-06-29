@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <concepts>
 #include <format>
@@ -15,6 +16,7 @@
 
 template <std::floating_point T>
 struct tolerance {
+  static constexpr T fmod = 50 * std::numeric_limits<T>::epsilon();
   static constexpr T angle_normalization_is_symmetrical_x_2 = 1.193e-7;
   static constexpr T angle_normalization_is_symmetrical_x_3 = 2.385e-7;
   static constexpr T angle_normalization_is_symmetrical_x_4 = 2.385e-7;
@@ -23,9 +25,8 @@ struct tolerance {
 
 TYPED_TEST(CopalTest, fabs) {
   using T = TypeParam;
-  std::vector<T>& inputs = this->testValuesA;
 
-  for (auto x : inputs) {
+  for (auto x : this->fixture_min_max()) {
     EXPECT_FLOAT_EQ(
       copal::scalar::fabs(x),
       copal::stdlib::fabs(x));
@@ -34,8 +35,9 @@ TYPED_TEST(CopalTest, fabs) {
 
 TYPED_TEST(CopalTest, fmod) {
   using T = TypeParam;
-  std::vector<T>& inputsA = this->testValuesA;
-  std::vector<T>& inputsB = this->testValuesB;
+  std::vector<T> inputsA = this->fixture_min_max();
+  std::vector<T> inputsB; inputsB.resize(inputsA.size()); 
+  std::reverse_copy(inputsA.begin(), inputsA.end(), inputsB.begin());
 
   for (size_t i; i < this->fixture_size; ++i) {
     T fmodCopal = copal::scalar::fmod(inputsA[i], inputsB[i]);
@@ -50,7 +52,6 @@ TYPED_TEST(CopalTest, fmod) {
 
 TYPED_TEST(CopalTest, lerp) {
   using T = TypeParam;
-  std::vector<T>& inputs = this->testValuesA;
 
   std::vector<std::pair<T, T>> lerpPairs = {
     {std::numeric_limits<T>::min(), std::numeric_limits<T>::max()},
@@ -60,9 +61,10 @@ TYPED_TEST(CopalTest, lerp) {
     {copal::num::pi_over_16<T>, -copal::num::pi_over_16<T>},
     {copal::num::pi_over_16<T>, -copal::num::pi_over_16<T>},
   };
+
   for (auto pair : lerpPairs) {
     auto [a, b] = pair;
-    for (auto lerpValue : inputs) {
+    for (auto lerpValue : this->fixture_min_max()) {
       T LerpScalar = copal::scalar::lerp<T>(a, b, lerpValue);
       T LerpStdlib = copal::stdlib::lerp<T>(a, b, lerpValue);
       
@@ -73,9 +75,8 @@ TYPED_TEST(CopalTest, lerp) {
 
 TYPED_TEST(CopalTest, floor) {
   using T = TypeParam;
-  std::vector<T>& inputs = this->testValuesA;
 
-  for (auto input : inputs) {
+  for (auto input : this->fixture_min_max()) {
     T floorScalar = copal::scalar::floor(input);
     T floorStdlib = copal::stdlib::floor(input);
     
@@ -85,14 +86,13 @@ TYPED_TEST(CopalTest, floor) {
 
 TYPED_TEST(CopalTest, angle_normalization_is_symmetrical) {
   using T = TypeParam;
-  std::vector<T>& inputs = this->quarterCycle;
 
   T quarterCycle      = copal::num::pi_over_2<T>;
   T halfCycle         = copal::num::pi_x_1<T>;
   T fullCycle         = copal::num::pi_x_2<T>;
   T threeQuarterCycle = halfCycle + quarterCycle;
 
-  for (auto input : inputs) {
+  for (auto input : this->fixture_quarter_cycle()) {
     T xIn_1 = input;
     T xIn_2 = halfCycle - input;
     T xIn_3 = input + halfCycle;
@@ -112,27 +112,24 @@ TYPED_TEST(CopalTest, angle_normalization_is_symmetrical) {
 
 TYPED_TEST(CopalTest, angle_normalization_sign_is_correct) {
   using T = TypeParam;
-  std::vector<T>& inputs = this->halfCycle;
-
-  for (auto input : inputs) {
+  for (auto input : this->fixture_half_cycle()) {
     T xIn1 = input;
     T xIn2 = input + copal::num::pi_x_1<T>;
 
     auto [x1, sign1] = copal::scalar::angle_normalization_pi_over_2<T>(xIn1);
     auto [x2, sign2] = copal::scalar::angle_normalization_pi_over_2<T>(xIn2);
     
-    EXPECT_FLOAT_EQ(sign1,  1);
-    EXPECT_FLOAT_EQ(sign2, -1);
+    EXPECT_EQ(sign1,  1);
+    EXPECT_EQ(sign2, -1);
   }
 }
 
 TYPED_TEST(CopalTest, angle_normalization_is_periodic) {
   using T = TypeParam;
-  std::vector<T>& inputs = this->fullCycle;
-  std::vector<T>  multipliers {1, 2, 3, 4, 10};
+  std::vector<T> multipliers {1, 2, 3, 4, 10};
 
   T oneCycle= copal::num::pi_x_2<T>;
-  for (auto input : inputs) {
+  for (auto input : this->fixture_full_cycle()) {
     auto [x1, sign1] = copal::scalar::angle_normalization_pi_over_2<T>(input);
     for (auto multiplier : multipliers) {
       auto [x2, sign2] = copal::scalar::angle_normalization_pi_over_2<T>(input + (multiplier * oneCycle));

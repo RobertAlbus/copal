@@ -1,9 +1,11 @@
 #pragma once
 
-#include <cmath>
 #include <concepts>
 #include <numbers>
 #include <type_traits>
+#include <utility>
+
+#include "num.hpp"
 
 namespace copal::scalar {
 
@@ -18,9 +20,10 @@ T fmod(T a, T b) {
   b = fabs<T>(b);
   if (a < 0) {
     sign = -1;
-    a = fabs<T>(a);
+    a *= -1;
   }
 
+  if (a == b) return 0;
   if (a <= b) return a;
 
   T fitTimes = a / b;
@@ -36,33 +39,32 @@ T lerp(T a, T b, T lerp) {
 
 template<std::floating_point T>
 T floor(T x) {
-  if constexpr (std::is_same_v<T, float>) {
-    return T(static_cast<int>(x));
-  } else if constexpr (std::is_same_v<T, double>) {
-    return T(static_cast<long int>(x));
-  } else {
-    static_assert(false, "copal::scalar::floor requires a float or double.");
+  T fractionalPart = fmod(x, {1});
+  T integerPart    = x - fractionalPart;
+  if (x < 0 && x != integerPart) {
+      return integerPart - 1;
   }
+  return integerPart;
 }
 
 template<std::floating_point T>
 std::pair<T, T>  angle_normalization_pi_over_2(T x) {
-  constexpr T halfPi = std::numbers::pi_v<T> * T(0.5);
-  constexpr T pi = std::numbers::pi_v<T>;
-  constexpr T twoPi = std::numbers::pi_v<T> * T(2);
+  constexpr T halfPi = copal::num::pi_over_2<T>;
+  constexpr T pi     = copal::num::pi_x_1<T>;
+  constexpr T twoPi  = copal::num::pi_x_2<T>;
 
   T sign = 1;
-  if (x > twoPi || x < -twoPi) {
+  if (x >= twoPi || x <= -twoPi) {
     x = fmod(x, twoPi);
   }
 
   if (x < 0) x += twoPi;
-  if (x > pi) {
+  if (x >= pi) {
     x -= pi;
     sign = -1;
   }
   if (x > halfPi) x = pi - x;
-  
+
   return { x, sign };
 }
 

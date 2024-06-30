@@ -2,35 +2,26 @@
 
 #include <cmath>
 #include <concepts>
+#include <limits>
 #include <numbers>
 #include <type_traits>
 #include <utility>
 
 #include "num.hpp"
+#include "stdlib/math.hpp"
 
 namespace copal::scalar {
 
 template<std::floating_point T>
 T fabs(T x) {
-  return x < T(0) ? -x : x;
+  return x < 0 ? -x : x;
 }
 
 template<std::floating_point T>
 T fmod(T a, T b) {
-  T sign = 1;
-  b = fabs<T>(b);
-  if (a < 0) {
-    sign = -1;
-    a *= -1;
-  }
-
-  if (a == b) return 0;
-  if (a <= b) return a;
-
-  T fitTimes = a / b;
-  T remainder = fitTimes - floor(fitTimes);
-
-  return remainder * b * sign;
+  // falls back to copal::stdlib::fmod
+  // see notes: Imprecision - FMOD
+  return copal::stdlib::fmod(a, b);
 }
 
 template<std::floating_point T>
@@ -57,15 +48,18 @@ std::pair<T, T>  angle_normalization_pi_over_2(T x) {
   constexpr T twoPi  = copal::num::pi_x_2<T>;
 
   T sign = 1;
+  
   if (x >= twoPi || x <= -twoPi) {
     x = fmod(x, twoPi);
   }
 
   if (x < 0) x += twoPi;
+  
   if (x >= pi) {
     x -= pi;
     sign = -1;
   }
+
   if (x > halfPi) x = pi - x;
 
   return { x, sign };

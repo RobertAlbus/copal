@@ -7,9 +7,12 @@
 #include <experimental/bits/simd_math.h>
 #include <type_traits>
 
+#include "num.hpp"
+#include "vector_stdx/math.hpp"
+#include "stdx_definition.hpp"
+
 namespace copal::vector_impl {
     
-namespace stdx = std::experimental;
 
 template<std::floating_point T>
 stdx::native_simd<T> fabs(stdx::native_simd<T>& data) {
@@ -19,9 +22,7 @@ stdx::native_simd<T> fabs(stdx::native_simd<T>& data) {
 
 template<std::floating_point T>
 stdx::native_simd<T> floor(const stdx::native_simd<T>& x) {
-  return stdx::static_simd_cast<stdx::native_simd<T>>(
-    stdx::static_simd_cast<stdx::native_simd<int>>(x)
-  );
+  return vector_stdx::floor(x);
 }
 
 template<std::floating_point T>
@@ -40,7 +41,7 @@ stdx::native_simd<T> fmod(const stdx::native_simd<T>& a, const stdx::native_simd
   stdx::native_simd_mask<T> a_gt_b = a_abs > b_abs;
   if (stdx::any_of(a_gt_b)) {
     stdx::native_simd<T> fitTimes = a_abs / b_abs;
-    stdx::native_simd<T> remainder = fitTimes - copal::vector_impl::floor(fitTimes);
+    stdx::native_simd<T> remainder = fitTimes - floor(fitTimes);
     stdx::where(a_gt_b, result) = remainder * b_abs * sign;
   }
   return result;
@@ -53,14 +54,24 @@ stdx::native_simd<T> lerp(const stdx::native_simd<T>& a, const stdx::native_simd
 
 template<std::floating_point T>
 std::pair<stdx::native_simd<T>, stdx::native_simd<T>>
-normalize_angle_pi_over_2(const stdx::native_simd<T>& x) {
-  const stdx::native_simd<T> halfPi = std::numbers::pi_v<T> * T(0.5);
-  const stdx::native_simd<T> pi     = std::numbers::pi_v<T>;
-  const stdx::native_simd<T> twoPi  = std::numbers::pi_v<T> * T(2);
+angle_normalization_pi_over_2(const stdx::native_simd<T>& x) {
+  const stdx::native_simd<T> halfPi = num::pi_over_2<T>;
+  const stdx::native_simd<T> pi     = num::pi_x_1<T>;
+  const stdx::native_simd<T> twoPi  = num::pi_x_2<T>;
   
-  stdx::native_simd<T> sign = T(1);
-  stdx::native_simd<T> xOut = copal::vector_impl::fmod<T>(x, twoPi);
+  stdx::native_simd<T> xOut = x;
 
+  stdx::native_simd_mask<T> gt_2pi = xOut > twoPi || xOut < -twoPi;
+  if(stdx::any_of(gt_2pi)) {
+    where(gt_2pi, xOut) = fmod<T>(x, twoPi);
+  }
+
+  stdx::native_simd_mask<T> lt_zero = xOut < 0;
+  if(stdx::any_of(lt_zero)) {
+    where(lt_zero, xOut) = xOut += twoPi;
+  }
+
+  stdx::native_simd<T> sign = T(1);
   stdx::native_simd_mask<T> gt_pi = xOut > pi;
   if(stdx::any_of(gt_pi)) {
     where(gt_pi, xOut) = xOut - pi;

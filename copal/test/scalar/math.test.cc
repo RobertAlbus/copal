@@ -140,18 +140,20 @@ TYPED_TEST(CopalTest, angle_normalization_sign_is_correct) {
 TYPED_TEST(CopalTest, angle_normalization_is_periodic) {
   using T = TypeParam;
   // see notes: Imprecision - Quarter Cycle Normalization
+  T oneCycle= copal::num::pi_x_2<T>;
+  auto inputs = this->createfixture(0, oneCycle, this->fixture_size + 1 /* up to but not including*/);
   std::ranges::iota_view<int, int> multipliers;
-  if constexpr (std::is_same_v<double, T>) {
+  if constexpr (std::is_same_v<float, T>) {
     multipliers = std::ranges::iota_view{0, 20};
-  }
-  else if constexpr (std::is_same_v<double, T>) {
+  } else if constexpr (std::is_same_v<double, T>) {
     multipliers = std::ranges::iota_view{0, 10000};
+  } else {
+    FAIL() << "CopalTest angle_normalization_is_periodic requires single or double precision float";
   }
 
-  T oneCycle= copal::num::pi_x_2<T>;
-  for (auto multiplier : multipliers) {
-    for (auto input : this->fixture_full_cycle()) {
+  for (auto input : inputs) {
     auto [x1, sign1] = copal::scalar::angle_normalization_pi_over_2<T>(input);
+    for (auto multiplier : multipliers) {
 
       auto [x2, sign2] = copal::scalar::angle_normalization_pi_over_2<T>(input + (multiplier * oneCycle));
 

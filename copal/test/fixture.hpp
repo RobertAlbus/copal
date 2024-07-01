@@ -30,23 +30,14 @@ struct CopalTest : public testing::Test {
   constexpr static size_t fixture_size = 4096;
 
   std::vector<T> fixture_min_max(size_t size = fixture_size) {
-    return createfixture(
+    return create_fixture(
       std::numeric_limits<T>::min(),
       std::numeric_limits<T>::max(),
       size
     );
   }
-  std::vector<T> fixture_quarter_cycle(size_t size = fixture_size + 1 /* up to but not including*/) {
-    return createfixture(0, copal::num::pi_over_2<T>, size);
-  }
-  std::vector<T> fixture_half_cycle(size_t size = fixture_size + 1 /* up to but not including*/) {
-    return createfixture(0, copal::num::pi_x_1<T>, size);
-  }
-  std::vector<T> fixture_full_cycle(size_t size = fixture_size + 1 /* up to but not including*/) {
-    return createfixture(0, copal::num::pi_x_2<T>, size);
-  }
 
-  std::vector<T> createfixture(T min, T max, size_t size = fixture_size) {
+  std::vector<T> create_fixture(T min, T max, size_t size = fixture_size) {
     assert(std::isfinite(min) && !std::isnan(min));
     assert(std::isfinite(max) && !std::isnan(max));
 
@@ -72,7 +63,7 @@ TYPED_TEST(CopalTest, fixture) {
   size_t numItems = 21;
   size_t end   = numItems / 2;
   size_t start = -end;
-  std::vector<T> fixture = this->createfixture(start, end, numItems);
+  std::vector<T> fixture = this->create_fixture(start, end, numItems);
 
   EXPECT_EQ(fixture.size(), numItems);
   for (size_t i = start; i < end; ++i) {

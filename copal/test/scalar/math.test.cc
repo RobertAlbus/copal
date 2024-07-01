@@ -105,7 +105,9 @@ TYPED_TEST(CopalTest, angle_normalization_is_symmetrical) {
   T fullCycle         = copal::num::pi_x_2<T>;
   T threeQuarterCycle = halfCycle + quarterCycle;
 
-  for (auto input : this->fixture_quarter_cycle()) {
+  auto inputs = this->create_fixture(0, quarterCycle, this->fixture_size + 1 /* up to but not including*/);
+
+  for (auto input : inputs) {
     T xIn_1 = input;
     T xIn_2 = halfCycle - input;
     T xIn_3 = input + halfCycle;
@@ -125,7 +127,11 @@ TYPED_TEST(CopalTest, angle_normalization_is_symmetrical) {
 
 TYPED_TEST(CopalTest, angle_normalization_sign_is_correct) {
   using T = TypeParam;
-  for (auto input : this->fixture_half_cycle()) {
+
+  T halfCycle= copal::num::pi_x_1<T>;
+  auto inputs = this->create_fixture(0, halfCycle, this->fixture_size + 1 /* up to but not including*/);
+
+  for (auto input : inputs) {
     T xIn1 = input;
     T xIn2 = input + copal::num::pi_x_1<T>;
 
@@ -141,7 +147,8 @@ TYPED_TEST(CopalTest, angle_normalization_is_periodic) {
   using T = TypeParam;
   // see notes: Imprecision - Quarter Cycle Normalization
   T oneCycle= copal::num::pi_x_2<T>;
-  auto inputs = this->createfixture(0, oneCycle, this->fixture_size + 1 /* up to but not including*/);
+  auto inputs = this->create_fixture(0, oneCycle, this->fixture_size + 1 /* up to but not including*/);
+
   std::ranges::iota_view<int, int> multipliers;
   if constexpr (std::is_same_v<float, T>) {
     multipliers = std::ranges::iota_view{0, 20};

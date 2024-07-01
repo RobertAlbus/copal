@@ -17,7 +17,7 @@
 
 TYPED_TEST(CopalTest, sin_lookup) {
   using T = TypeParam;
-  std::vector<T> inputs = this->createfixture(-6.5, 6.5, 30);
+  std::vector<T> inputs = this->create_fixture(-6.5, 6.5, 30);
 
   for (auto input : inputs) {
     T sinScalar = copal::scalar::sin_lookup(input);
@@ -37,7 +37,7 @@ TYPED_TEST(CopalTest, sin_lookup) {
 
 TYPED_TEST(CopalTest, sin_taylor) {
   using T = TypeParam;
-  std::vector<T> inputs = this->createfixture(-6.5, 6.5, 30);
+  std::vector<T> inputs = this->create_fixture(-6.5, 6.5, 30);
 
   for (auto input : inputs) {
     T sinScalar = copal::scalar::sin_taylor(input);

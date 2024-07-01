@@ -1,12 +1,9 @@
 #include <array>
 #include <concepts>
+#include <experimental/simd>
 #include <experimental/bits/simd.h>
-#include <functional>
-#include <numbers>
 #include <type_traits>
 #include <random>
-#include <string>
-#include <format>
 
 // ----
 // libs
@@ -15,12 +12,13 @@
 // ----
 // headers
 #include "scalar/sin.hpp"
+#include "num.hpp"
 #include "sin_lut.hpp"
+#include "stdx_definition.hpp"
 #include "stdlib/sin.hpp"
 #include "vector_impl/sin.hpp"
 #include "vector_stdx/sin.hpp"
 
-#include "stdx_definition.hpp"
 
 
 // ----
@@ -40,10 +38,8 @@ std::array<T, size> randArray(T lowest, T highest) {
     return randomArray;
 }
 
-template<std::floating_point T>
-static constexpr size_t alignment = sizeof(T) * std::experimental::native_simd<T>::size();
-
-#define aligned_array(T, size)        alignas(alignment<T>)        std::array<T, size>
+#define aligned_array(T, size) \
+alignas(stdx::memory_alignment_v<stdx::native_simd<T>>) std::array<T, size>
 
 // --------------------------------
 // benchmarks : non-simd
@@ -51,7 +47,7 @@ static constexpr size_t alignment = sizeof(T) * std::experimental::native_simd<T
 template<std::floating_point T, int numerator, int denominator>
 struct pi_params {
     using Type = T;
-    constexpr static T max = T(numerator) / T(denominator) * std::numbers::pi_v<T>;
+    constexpr static T max = T(numerator) / T(denominator) * copal::num::pi_x_1<T>;
     constexpr static T min = -max;
 };                                                                               
 
@@ -62,11 +58,11 @@ static void BM_copal_##impl_name(benchmark::State& state) { \
   using T = params::Type;                                   \
   aligned_array(T, testInputSize) x_in =                    \
     randArray<T, testInputSize>(params::min, params::max);  \
-  aligned_array(T, testInputSize) x_out;                    \
                                                             \
   for (auto _ : state) {                                    \
     for(size_t i = 0; i < testInputSize; ++i) {             \
       benchmark::DoNotOptimize(impl(x_in[i]));              \
+      benchmark::ClobberMemory();                           \
     }                                                       \
   }                                                         \
 }
@@ -120,25 +116,27 @@ BENCHMARK(BM_copal_stdlib_sin_stdlib<pi_params<float, 16, 1>>);
 // --------------------------------
 // benchmarks : simd
 
-#define BM_define_copal_simd(impl_name, impl)               \
-template<typename params>                                   \
-static void BM_copal_##impl_name(benchmark::State& state) { \
-  using T = params::Type;                                   \
-  aligned_array(T, testInputSize) x_in =                    \
-    randArray<T, testInputSize>(params::min, params::max);  \
-  aligned_array(T, testInputSize) x_out;                    \
-                                                            \
-  for (auto _ : state) {                                    \
-    stdx::native_simd<T>* simd_x     = reinterpret_cast<stdx::native_simd<T>*>(&(x_in[0])); \
-    stdx::native_simd<T>* simd_x_out = reinterpret_cast<stdx::native_simd<T>*>(&(x_out[0]));\
-                                                                      \
-    const std::size_t size = stdx::native_simd<T>::size();            \
-    for(std::size_t i = 0; i + size <= copal::lut::size; i += size) { \
-      size_t idx = i / size;                                          \
-      stdx::native_simd<T> chunk_x = simd_x[idx];                     \
-      benchmark::DoNotOptimize(simd_x_out[idx] = impl(chunk_x));      \
-    }                                                                 \
-  }                                                                   \
+#define BM_define_copal_simd(impl_name, impl)                    \
+template<typename params>                                        \
+static void BM_copal_##impl_name(benchmark::State& state) {      \
+  using T = params::Type;                                        \
+  aligned_array(T, testInputSize) x_in =                         \
+          randArray<T, testInputSize>(params::min, params::max); \
+                                                                 \
+  aligned_array(T, stdx::native_simd<T>::size()) x_out = {};     \
+  for (auto _ : state) {                                         \
+    stdx::native_simd<T> simd_x;                                 \
+    simd_x.copy_from(&x_in[0], stdx::vector_aligned);            \
+    stdx::native_simd<T> simd_x_out;                             \
+    const std::size_t size = stdx::native_simd<T>::size();       \
+    for(std::size_t i = 0; i + size <= x_in.size(); i += size) { \
+      size_t idx = i / size;                                     \
+      stdx::native_simd<T> chunk_x = simd_x[idx];                \
+      benchmark::DoNotOptimize(simd_x_out = impl(simd_x));       \
+      simd_x_out.copy_to(&(x_out[0]), stdx::vector_aligned);     \
+      benchmark::ClobberMemory();                                \
+    }                                                            \
+  }                                                              \
 }
 
 BM_define_copal_simd(vector_impl_sin_lookup, copal::vector_impl::sin_lookup)

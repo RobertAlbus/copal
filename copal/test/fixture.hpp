@@ -11,6 +11,19 @@
 
 
 template <std::floating_point T>
+struct tolerance {
+  static constexpr T fmod = 10e5 * std::numeric_limits<T>::epsilon();
+  static constexpr T angle_normalization_is_symmetrical_x_2 = 1.2e-7;
+  static constexpr T angle_normalization_is_symmetrical_x_3 = 2.4e-7;
+  static constexpr T angle_normalization_is_symmetrical_x_4 = 2.4e-7;
+  static constexpr T angle_normalization_is_periodic        = 7.0e-6;
+  static constexpr T sin_lookup_float                       = 2.4e-7;
+  static constexpr T sin_lookup_double                      = 1.4e-7;
+  static constexpr T sin_taylor_float                       = 1.8e-7;
+  static constexpr T sin_taylor_double                      = 1.0e-7;
+};
+
+template <std::floating_point T>
 struct CopalTest : public testing::Test {
   void SetUp() override { }
 

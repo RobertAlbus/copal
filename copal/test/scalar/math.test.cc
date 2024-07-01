@@ -17,15 +17,6 @@
 #include "num.hpp"
 #include "stdlib/math.hpp"
 
-template <std::floating_point T>
-struct tolerance {
-  static constexpr T fmod = 10e5 * std::numeric_limits<T>::epsilon();
-  static constexpr T angle_normalization_is_symmetrical_x_2 = 1.193e-7;
-  static constexpr T angle_normalization_is_symmetrical_x_3 = 2.385e-7;
-  static constexpr T angle_normalization_is_symmetrical_x_4 = 2.385e-7;
-  static constexpr T angle_normalization_is_periodic        = 6.915e-6;
-};
-
 TYPED_TEST(CopalTest, fabs) {
   using T = TypeParam;
 

@@ -5,6 +5,7 @@
 #include <type_traits>
 
 #include "math.hpp"
+#include "num.hpp"
 #include "sin_lut.hpp"
 
 namespace copal::scalar {
@@ -27,12 +28,11 @@ T sin_taylor(T xIn) {
 template<std::floating_point T>
 T sin_lookup(T xIn) {
   auto [x, sign] = angle_normalization_pi_over_2(xIn);
-
-  T index_f = x * (lut::max_index);
+  T index_f = x / num::pi_over_2<T> * lut::max_index;
   size_t index_A = static_cast<size_t>(index_f);
 
   if (index_A > copal::lut::max_index) {
-    return copal::lut::get<T>()[index_A];
+    return copal::lut::get<T>()[copal::lut::max_index];
   }
 
   size_t index_B = index_A + 1;

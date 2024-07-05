@@ -24,6 +24,5 @@ target_link_libraries(benchmark benchmark::benchmark stdc++ m)
 
 file(GLOB_RECURSE TEST_CPP ${CMAKE_CURRENT_LIST_DIR}/*.test.cc)
 add_executable(test ${TEST_CPP})
-target_include_directories(test PRIVATE "includes")
-target_include_directories(test PRIVATE "test")
+target_include_directories(test PRIVATE "includes" "test")
 target_link_libraries(test GTest::gtest GTest::gtest_main stdc++ m)

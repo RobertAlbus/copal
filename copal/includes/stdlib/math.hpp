@@ -35,6 +35,8 @@ T fmod(T a, T b) {
 
 template<std::floating_point T>
 T lerp(T a, T b, T lerp) {
+    if (std::isinf(a) || std::isinf(b) || std::isinf(lerp))
+        return a*b*lerp;
     return std::lerp<T>(a, b, lerp);
 }
 
@@ -58,16 +60,17 @@ std::pair<T, T>  angle_normalization_pi_over_2(T x) {
     constexpr T twoPi = std::numbers::pi_v<T> * T(2);
 
     T sign = 1;
-    if (x > twoPi || x < -twoPi) {
-          x = fmod(x, twoPi);
-    }
+    if (x >= twoPi || x <= -twoPi)
+      x = fmod(x, twoPi);
 
-    if (x < 0) x += twoPi;
-    if (x > pi) {
-        x -= pi;
-        sign = -1;
+    if (x < 0)
+      x += twoPi;
+
+    if (x >= pi) {
+      x -= pi;
+      sign = -1;
     }
-    if (x > halfPi) x = pi - x;
+    if (x >= halfPi) x = pi - x;
 
     return {x, sign};
 }

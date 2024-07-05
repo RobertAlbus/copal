@@ -20,7 +20,6 @@
 #include "vector_stdx/sin.hpp"
 
 
-
 // ----
 // fixtures
 const size_t testInputSize = 2048;
@@ -125,24 +124,22 @@ static void BM_copal_##impl_name(benchmark::State& state) {      \
                                                                  \
   aligned_array(T, stdx::native_simd<T>::size()) x_out = {};     \
   for (auto _ : state) {                                         \
-    stdx::native_simd<T> simd_x;                                 \
-    simd_x.copy_from(&x_in[0], stdx::vector_aligned);            \
-    stdx::native_simd<T> simd_x_out;                             \
-    const std::size_t size = stdx::native_simd<T>::size();       \
-    for(std::size_t i = 0; i + size <= x_in.size(); i += size) { \
-      size_t idx = i / size;                                     \
-      stdx::native_simd<T> chunk_x = simd_x[idx];                \
-      benchmark::DoNotOptimize(simd_x_out = impl(simd_x));       \
-      simd_x_out.copy_to(&(x_out[0]), stdx::vector_aligned);     \
-      benchmark::ClobberMemory();                                \
-    }                                                            \
-  }                                                              \
+    for (size_t i = 0; i < x_in.size(); i += stdx::native_simd<T>::size()) { \
+      stdx::native_simd<T> simd_x(&x_in[i], stdx::vector_aligned); \
+      const std::size_t size = stdx::native_simd<T>::size();       \
+        size_t idx = i / size;                                     \
+        stdx::native_simd<T> simd_x_out {};                        \
+        benchmark::DoNotOptimize(simd_x_out = impl(simd_x));       \
+        benchmark::ClobberMemory();                                \
+    }                                                              \
+  }                                                                \
 }
 
 BM_define_copal_simd(vector_impl_sin_lookup, copal::vector_impl::sin_lookup)
 BM_define_copal_simd(vector_impl_sin_taylor, copal::vector_impl::sin_taylor)
 BM_define_copal_simd(vector_stdx_sin_lookup, copal::vector_stdx::sin_lookup)
 BM_define_copal_simd(vector_stdx_sin_taylor, copal::vector_stdx::sin_taylor)
+BM_define_copal_simd(vector_stdx_sin_stdlib, copal::vector_stdx::sin_stdlib)
 
 BENCHMARK(BM_copal_vector_impl_sin_lookup<pi_params<float,  1, 4>>);
 BENCHMARK(BM_copal_vector_impl_sin_lookup<pi_params<float,  1, 2>>);
@@ -176,3 +173,10 @@ BENCHMARK(BM_copal_vector_stdx_sin_taylor<pi_params<float,  4, 1>>);
 BENCHMARK(BM_copal_vector_stdx_sin_taylor<pi_params<float,  8, 1>>);
 BENCHMARK(BM_copal_vector_stdx_sin_taylor<pi_params<float, 16, 1>>);
 
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float,  1, 4>>);
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float,  1, 2>>);
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float,  1, 1>>);
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float,  2, 1>>);
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float,  4, 1>>);
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float,  8, 1>>);
+BENCHMARK(BM_copal_vector_stdx_sin_stdlib<pi_params<float, 16, 1>>);

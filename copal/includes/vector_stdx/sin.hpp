@@ -42,12 +42,14 @@ stdx::native_simd<T> sin_lookup(const stdx::native_simd<T>& xIn) {
 const stdx::native_simd<T> halfPi = copal::num::pi_over_2<T>;
   auto [x, sign] = angle_normalization_pi_over_2(xIn);
 
+  using Int = std::conditional_t<std::is_same_v<T, float>, int,
+        std::conditional_t<std::is_same_v<T, double>, long int, long long>>;
   stdx::native_simd<T>   index_f  = x / copal::num::pi_over_2<T> * T(lut::max_index);
-  stdx::native_simd<int> index_A  = stdx::static_simd_cast<stdx::native_simd<int>>(index_f);
+  stdx::native_simd<Int> index_A  = stdx::static_simd_cast<stdx::native_simd<Int>>(index_f);
   stdx::native_simd<T>   index_Af = stdx::static_simd_cast<stdx::native_simd<T>>(index_A);
-  stdx::native_simd<int> index_B  = ++index_A;
+  stdx::native_simd<Int> index_B  = ++index_A;
 
-  stdx::native_simd_mask<int> invalidIndex_i = index_A  >= copal::lut::max_index_i;
+  stdx::native_simd_mask<Int> invalidIndex_i = index_A  >= copal::lut::max_index_i;
   stdx::native_simd_mask<T>   invalidIndex   = index_Af >= copal::lut::max_index_i;
   if (stdx::any_of(invalidIndex_i)) {
     stdx::where(invalidIndex,   index_f ) = copal::lut::max_index_i;

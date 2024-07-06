@@ -19,10 +19,10 @@ find_package(benchmark REQUIRED)
 
 file(GLOB_RECURSE BENCHMARK_CPP ${CMAKE_CURRENT_LIST_DIR}/benchmark/*.cpp)
 add_executable(benchmark ${BENCHMARK_CPP})
-target_include_directories(benchmark PRIVATE "includes")
-target_link_libraries(benchmark benchmark::benchmark stdc++ m)
+target_include_directories(benchmark PRIVATE "include")
+target_link_libraries(benchmark benchmark::benchmark profiler stdc++ m)
 
 file(GLOB_RECURSE TEST_CPP ${CMAKE_CURRENT_LIST_DIR}/*.test.cc)
 add_executable(test ${TEST_CPP})
-target_include_directories(test PRIVATE "includes" "test")
+target_include_directories(test PRIVATE "include" "test")
 target_link_libraries(test GTest::gtest GTest::gtest_main stdc++ m)

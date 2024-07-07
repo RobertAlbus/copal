@@ -54,15 +54,15 @@ const std::array<long double, size> sinLUT_ld = create_sin_lut<long double, size
 
 template<std::floating_point T>
 const std::array<T, size>& get() {
-    if constexpr (std::is_same_v<T, float>) {
-      return sinLUT_f;
-    } else if constexpr (std::is_same_v<T, double>) {
-      return sinLUT_d;
-    } else if constexpr (std::is_same_v<T, long double>) {
-      return sinLUT_ld;
-    } else {
-      static_assert(std::is_floating_point_v<T>, "copal::lut::get<T> requires a floating point type.");
-    }
+  if constexpr (std::is_same_v<T, float>) {
+    return sinLUT_f;
+  } else if constexpr (std::is_same_v<T, double>) {
+    return sinLUT_d;
+  } else if constexpr (std::is_same_v<T, long double>) {
+    return sinLUT_ld;
+  } else {
+    static_assert(std::is_floating_point_v<T>, "copal::lut::get<T> requires a floating point type.");
+  }
 }
 
 }

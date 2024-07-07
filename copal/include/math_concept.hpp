@@ -32,13 +32,12 @@ concept CopalMath = requires {
     requires requires(Impl::T a, Impl::T b, Impl::T lerpFactor) {
         { Impl::sin_lookup(a)          } -> std::same_as<typename Impl::T>;
         { Impl::sin_taylor(a)          } -> std::same_as<typename Impl::T>;
-        { Impl::sin_stdlib(a)       } -> std::same_as<typename Impl::T>;
+        { Impl::sin_stdlib(a)          } -> std::same_as<typename Impl::T>;
         { Impl::fmod(a, b)             } -> std::same_as<typename Impl::T>;
         { Impl::lerp(a, b, lerpFactor) } -> std::same_as<typename Impl::T>;
         { Impl::floor(a)               } -> std::same_as<typename Impl::T>;
         { Impl::angle_normalization_pi_over_2(a) } -> std::same_as<std::pair<typename Impl::T, typename Impl::T>>;
     };
-
 };
 
 template<std::floating_point Type>

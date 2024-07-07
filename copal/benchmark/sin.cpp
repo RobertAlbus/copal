@@ -11,13 +11,10 @@
 
 // ----
 // headers
-#include "scalar/sin.hpp"
+#include "math_concept.hpp"
 #include "num.hpp"
 #include "sin_lut.hpp"
 #include "stdx_definition.hpp"
-#include "stdlib/sin.hpp"
-#include "vector_impl/sin.hpp"
-#include "vector_stdx/sin.hpp"
 
 
 // ----
@@ -51,7 +48,7 @@ struct pi_params {
 };                                                                               
 
 
-#define BM_copal_single(impl_name, impl)\
+#define BM_define_copal_single(impl_name, impl)\
 template<typename params>                                   \
 static void BM_copal_##impl_name(benchmark::State& state) { \
   using T = params::Type;                                   \
@@ -66,11 +63,11 @@ static void BM_copal_##impl_name(benchmark::State& state) { \
   }                                                         \
 }
 
-BM_copal_single(scalar_sin_lookup, copal::scalar::sin_lookup)
-BM_copal_single(scalar_sin_taylor, copal::scalar::sin_taylor)
-BM_copal_single(stdlib_sin_lookup, copal::stdlib::sin_lookup)
-BM_copal_single(stdlib_sin_taylor, copal::stdlib::sin_taylor)
-BM_copal_single(stdlib_sin_stdlib, copal::stdlib::sin_stdlib)
+BM_define_copal_single(scalar_sin_lookup, copal::Scalar<float>::sin_lookup)
+BM_define_copal_single(scalar_sin_taylor, copal::Scalar<float>::sin_taylor)
+BM_define_copal_single(stdlib_sin_lookup, copal::Stdlib<float>::sin_lookup)
+BM_define_copal_single(stdlib_sin_taylor, copal::Stdlib<float>::sin_taylor)
+BM_define_copal_single(stdlib_sin_stdlib, copal::Stdlib<float>::sin_stdlib)
 
 BENCHMARK(BM_copal_scalar_sin_lookup<pi_params<float,  1, 4>>);
 BENCHMARK(BM_copal_scalar_sin_lookup<pi_params<float,  1, 2>>);
@@ -135,11 +132,11 @@ static void BM_copal_##impl_name(benchmark::State& state) {      \
   }                                                                \
 }
 
-BM_define_copal_simd(vector_impl_sin_lookup, copal::vector_impl::sin_lookup)
-BM_define_copal_simd(vector_impl_sin_taylor, copal::vector_impl::sin_taylor)
-BM_define_copal_simd(vector_stdx_sin_lookup, copal::vector_stdx::sin_lookup)
-BM_define_copal_simd(vector_stdx_sin_taylor, copal::vector_stdx::sin_taylor)
-BM_define_copal_simd(vector_stdx_sin_stdlib, copal::vector_stdx::sin_stdlib)
+BM_define_copal_simd(vector_impl_sin_lookup, copal::VectorImpl<float>::sin_lookup)
+BM_define_copal_simd(vector_impl_sin_taylor, copal::VectorImpl<float>::sin_taylor)
+BM_define_copal_simd(vector_stdx_sin_lookup, copal::VectorStdx<float>::sin_lookup)
+BM_define_copal_simd(vector_stdx_sin_taylor, copal::VectorStdx<float>::sin_taylor)
+BM_define_copal_simd(vector_stdx_sin_stdlib, copal::VectorStdx<float>::sin_stdlib)
 
 BENCHMARK(BM_copal_vector_impl_sin_lookup<pi_params<float,  1, 4>>);
 BENCHMARK(BM_copal_vector_impl_sin_lookup<pi_params<float,  1, 2>>);

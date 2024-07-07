@@ -12,6 +12,7 @@
 #include "stdlib/math.hpp"
 #include "stdlib/sin.hpp"
 
+#include "stdlib/sin_stdlib.hpp"
 #include "vector_impl/math.hpp"
 #include "vector_impl/sin.hpp"
 
@@ -31,6 +32,7 @@ concept CopalMath = requires {
     requires requires(Impl::T a, Impl::T b, Impl::T lerpFactor) {
         { Impl::sin_lookup(a)          } -> std::same_as<typename Impl::T>;
         { Impl::sin_taylor(a)          } -> std::same_as<typename Impl::T>;
+        { Impl::sin_stdlib(a)       } -> std::same_as<typename Impl::T>;
         { Impl::fmod(a, b)             } -> std::same_as<typename Impl::T>;
         { Impl::lerp(a, b, lerpFactor) } -> std::same_as<typename Impl::T>;
         { Impl::floor(a)               } -> std::same_as<typename Impl::T>;
@@ -46,6 +48,7 @@ struct Scalar {
 
     static T sin_lookup(T x)              { return copal::scalar::sin_lookup(x);          }
     static T sin_taylor(T x)              { return copal::scalar::sin_taylor(x);          }
+    static T sin_stdlib(T x)              { return copal::stdlib::sin_stdlib(x);          }
     static T fabs(T x)                    { return copal::scalar::fabs(x);                }
     static T fmod(T a, T b)               { return copal::scalar::fmod(a, b);             }
     static T lerp(T a, T b, T lerpFactor) { return copal::scalar::lerp(a, b, lerpFactor); }
@@ -60,6 +63,7 @@ struct Stdlib {
 
     static T sin_lookup(T x)              { return copal::stdlib::sin_lookup(x);          }
     static T sin_taylor(T x)              { return copal::stdlib::sin_taylor(x);          }
+    static T sin_stdlib(T x)              { return copal::stdlib::sin_stdlib(x);          }
     static T fabs(T x)                    { return copal::stdlib::fabs(x);                }
     static T fmod(T a, T b)               { return copal::stdlib::fmod(a, b);             }
     static T lerp(T a, T b, T lerpFactor) { return copal::stdlib::lerp(a, b, lerpFactor); }
@@ -74,6 +78,7 @@ struct VectorImpl {
 
     static T sin_lookup(T x)              { return copal::vector_impl::sin_lookup(x);          }
     static T sin_taylor(T x)              { return copal::vector_impl::sin_taylor(x);          }
+    static T sin_stdlib(T x)              { return copal::vector_stdx::sin_stdlib(x);          }
     static T fabs(T x)                    { return copal::vector_impl::fabs(x);                }
     static T fmod(T a, T b)               { return copal::vector_impl::fmod(a, b);             }
     static T lerp(T a, T b, T lerpFactor) { return copal::vector_impl::lerp(a, b, lerpFactor); }
@@ -88,6 +93,7 @@ struct VectorStdx {
 
     static T sin_lookup(T x)              { return copal::vector_stdx::sin_lookup(x);          }
     static T sin_taylor(T x)              { return copal::vector_stdx::sin_taylor(x);          }
+    static T sin_stdlib(T x)              { return copal::vector_stdx::sin_stdlib(x);          }
     static T fabs(T x)                    { return copal::vector_stdx::fabs(x);                }
     static T fmod(T a, T b)               { return copal::vector_stdx::fmod(a, b);             }
     static T lerp(T a, T b, T lerpFactor) { return copal::vector_stdx::lerp(a, b, lerpFactor); }

@@ -26,7 +26,7 @@ stdx::native_simd<T> fabs(const stdx::native_simd<T>& data) {
 
 template<std::floating_point T>
 stdx::native_simd<T> floor(const stdx::native_simd<T>& x) {
-  return vector_stdx::floor(x);
+  return x - fmod(x, {1});
 }
 
 template<std::floating_point T>

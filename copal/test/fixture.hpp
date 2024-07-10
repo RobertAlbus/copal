@@ -12,6 +12,10 @@
 
 
 #include "math_concept.hpp"
+#include "scalar.hpp"
+#include "stdlib.hpp"
+#include "vector_impl.hpp"
+#include "vector_stdx.hpp"
 
 #include "stdx_definition.hpp"
 #include "num.hpp"
@@ -58,8 +62,8 @@ struct CopalTest_Templated : public testing::Test {
   }
 
   std::vector<T> create_fixture(T min, T max, size_t size = fixture_size) {
-    assert(std::isfinite(min) && !std::isnan(min));
-    assert(std::isfinite(max) && !std::isnan(max));
+    assert(std::isfinite(min));
+    assert(std::isfinite(max));
 
     std::vector<T> vec;
     vec.reserve(size);
@@ -70,20 +74,6 @@ struct CopalTest_Templated : public testing::Test {
     }
 
     return vec;
-  }
-
-  std::array<T, 4096> create_fixture_array(T min, T max) {
-    assert(std::isfinite(min) && !std::isnan(min));
-    assert(std::isfinite(max) && !std::isnan(max));
-
-    std::array<T, 4096> array;
-
-    for (size_t i = 0; i < 4096; ++i) {
-      T lerpAmount = T(i) / 4096;
-      array[i] = std::lerp<T>(min, max, lerpAmount);
-    }
-
-    return array;
   }
 };
 

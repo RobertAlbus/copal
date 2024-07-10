@@ -16,8 +16,8 @@
 
 TYPED_TEST(CopalTest_Templated, fabs) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   std::vector<Float> inputs = this->fixture_min_max();
 
@@ -38,8 +38,8 @@ TYPED_TEST(CopalTest_Templated, fabs) {
 
 TYPED_TEST(CopalTest_Templated, fmod) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   std::vector<Float> inputs = this->fixture_min_max();
 
@@ -59,8 +59,11 @@ TYPED_TEST(CopalTest_Templated, fmod) {
     }
   } else if constexpr (stdx::is_simd_v<T>) {
     for (size_t i; i < inputs.size(); ++i) {
+      // create a uniform vector for each individual value in
+      // inputs.
+      T a_chunk {inputs[i]};
+
       for (size_t j = 0; j < inputs.size(); j += T::size()) {
-        T a_chunk(inputs[i]);
         T b_chunk(&inputs[j], stdx::element_aligned);
         T result = mathlib::fmod(a_chunk, b_chunk);
         for (size_t k = 0; k < T::size(); ++k) {
@@ -75,10 +78,44 @@ TYPED_TEST(CopalTest_Templated, fmod) {
   }
 }
 
+TYPED_TEST(CopalTest_Templated, fmod_always_positive) {
+  using mathlib = TypeParam;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
+
+  std::vector<Float> inputs = this->fixture_min_max();
+
+  if constexpr (std::is_floating_point_v<T>) {
+    for (size_t i; i < inputs.size(); ++i) {
+      for (size_t j = 0; j < inputs.size(); ++j) {
+        T result   = mathlib::fmod(inputs[i], inputs[j]);
+
+        if (!std::isnan(result))
+          EXPECT_GE(result, 0);
+      }
+    }
+  } else if constexpr (stdx::is_simd_v<T>) {
+    for (size_t i; i < inputs.size(); ++i) {
+      // create a uniform vector for each individual value in
+      // inputs.
+      T a_chunk {inputs[i]};
+
+      for (size_t j = 0; j < inputs.size(); j += T::size()) {
+        T b_chunk {&inputs[j], stdx::element_aligned};
+        T result = mathlib::fmod(a_chunk, b_chunk);
+        for (size_t k = 0; k < T::size(); ++k) {
+          if (!std::isnan(result[k]))
+            EXPECT_GE(result[k], 0);
+        }
+      }
+    }
+  }
+}
+
 TYPED_TEST(CopalTest_Templated, lerp) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   std::vector<Float> inputs = this->fixture_min_max();
 
@@ -115,8 +152,8 @@ TYPED_TEST(CopalTest_Templated, lerp) {
 
 TYPED_TEST(CopalTest_Templated, lerp_by_initity) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   Float inf  = std::numeric_limits<Float>::infinity();
   Float ninf = -inf;
@@ -148,8 +185,8 @@ TYPED_TEST(CopalTest_Templated, lerp_by_initity) {
 
 TYPED_TEST(CopalTest_Templated, floor) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   std::vector<Float> inputs = this->fixture_min_max();
 
@@ -171,8 +208,8 @@ TYPED_TEST(CopalTest_Templated, floor) {
 
 TYPED_TEST(CopalTest_Templated, angle_normalization_is_symmetrical) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   Float quarterCycle      = copal::num::pi_over_2<Float>;
   Float halfCycle         = copal::num::pi_x_1<Float>;
@@ -235,8 +272,8 @@ TYPED_TEST(CopalTest_Templated, angle_normalization_is_symmetrical) {
 
 TYPED_TEST(CopalTest_Templated, angle_normalization_sign_is_correct) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   Float halfCycle = copal::num::pi_x_1<Float>;
 
@@ -272,10 +309,48 @@ TYPED_TEST(CopalTest_Templated, angle_normalization_sign_is_correct) {
 
 TYPED_TEST(CopalTest_Templated, angle_normalization_x_always_positive) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
-  alignas(128) std::vector<Float> inputs = this->fixture_min_max();
+  std::vector<Float> inputs = this->fixture_min_max();
+
+  if constexpr (std::is_floating_point_v<T>) {
+    for (auto input : inputs) {
+      auto [x, sign] = mathlib::angle_normalization_pi_over_2(input);
+
+      EXPECT_GE(x, 0);
+    }
+  } else if constexpr (stdx::is_simd_v<T>) {
+    for (size_t i = 0; i < inputs.size(); i += T::size()) {
+      T xChunk (&(inputs[i]), stdx::element_aligned);
+      auto [x, sign] = mathlib::angle_normalization_pi_over_2(xChunk);
+
+      for (size_t j = 0; j < T::size(); ++j) {
+        EXPECT_GE(x[j], 0);
+      }
+    }
+  }
+}
+
+TYPED_TEST(CopalTest_Templated, angle_normalization_x_always_positive_rand_values) {
+  using mathlib = TypeParam;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
+
+  // This fixture contains data from a segfaulted benchmark run.
+  // Mixed values, rather than sequential values, seem to cause
+  // issues with the sign returned for returned `x` in quarter
+  // cycle normalization.
+  std::vector<Float> inputs = {
+    3.17305756,
+    -12.5256844,
+    -12.2319126,
+    3.06341553,
+    -0.133784294,
+    -1.81258774,
+    9.13261699,
+    -11.1933041
+  };
 
   if constexpr (std::is_floating_point_v<T>) {
     for (auto input : inputs) {
@@ -297,8 +372,8 @@ TYPED_TEST(CopalTest_Templated, angle_normalization_x_always_positive) {
 
 TYPED_TEST(CopalTest_Templated, angle_normalization_is_periodic) {
   using mathlib = TypeParam;
-  using T       = mathlib::T;
-  using Float   = mathlib::Float;
+  using T       = typename mathlib::T;
+  using Float   = typename mathlib::Float;
 
   Float fullCycle = copal::num::pi_x_2<Float>;
 

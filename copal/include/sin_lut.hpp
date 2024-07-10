@@ -8,26 +8,9 @@
 #include <type_traits>
 
 #include "num.hpp"
-#include "stdlib/sin_stdlib.hpp"
 #include "stdx_definition.hpp"
 
 namespace copal::lut {
-
-template<std::floating_point T, std::size_t size>
-std::array<T, size> create_sin_lut() {
-  std::array<T, size> lut;
-  constexpr T rangeMin = 0;
-  constexpr T rangeMax = copal::num::pi_over_2<T>;
-  constexpr T segments = static_cast<T>(size); // segments = indices-1
-  constexpr T segmentsReciprocal = T(1) / segments;
-  
-  for (size_t i = 0; i < size; ++i) {
-    T position = static_cast<T>(i) * segmentsReciprocal * rangeMax;
-    lut[i] = copal::stdlib::sin_stdlib<T>(position);
-  }
-
-  return lut;
-}
 
 // // original size 2^11 | 2048   * [4,8] bytes is [8.2, 16.4] kilobytes
 // constexpr int    size_i              = 2048;
@@ -42,6 +25,28 @@ constexpr size_t size                = size_i;
 constexpr size_t max_index           = max_index_i;
 constexpr size_t max_index_minus_1   = max_index_minus_1_i;
 
+template<std::floating_point T, std::size_t size>
+std::array<T, size> create_sin_lut() {
+  std::array<T, size> lut;
+  constexpr T rangeMin = 0;
+  constexpr T rangeMax = num::pi_over_2<T>;
+  constexpr T segments = static_cast<T>(size); // segments = indices-1
+  constexpr T segmentsReciprocal = T(1) / segments;
+  
+  for (size_t i = 0; i < size; ++i) {
+    T position = static_cast<T>(i) * segmentsReciprocal * rangeMax;
+
+    if constexpr(std::is_same_v<T, float>) {
+      lut[i] = std::sinf(position);    
+    } else if constexpr(std::is_same_v<T, double>) {
+      lut[i] = std::sin(position);    
+    } else if constexpr(std::is_same_v<T, float>) {
+      lut[i] = std::sinl(position);    
+    }
+  }
+
+  return lut;
+}
 
 alignas(stdx::memory_alignment_v<stdx::native_simd<float>>)
 const std::array<float,       size> sinLUT_f  = create_sin_lut<float,       size>();

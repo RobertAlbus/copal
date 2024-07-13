@@ -13,6 +13,7 @@
 // ----
 // headers
 #include "vector_impl.hpp"
+#include "num.hpp"
 #include "vector_stdx.hpp"
 #include "scalar.hpp"
 #include "stdlib.hpp"

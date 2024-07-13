@@ -11,7 +11,6 @@ set(EXTRA_INCLUDE_DIR "" CACHE PATH "Path to the extra include directory")
 
 add_compile_options(-O3 -march=native)
 
-include_directories(BEFORE SYSTEM "include")
 include_directories(BEFORE SYSTEM ${EXTRA_INCLUDE_DIR})
 include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_LIST_DIR}/include)
 
@@ -21,14 +20,12 @@ find_package(GTest REQUIRED CONFIG)
 set(benchmark_DIR ${EXTRA_LIB_DIR}/cmake/benchmark)
 find_package(benchmark REQUIRED CONFIG)
 
-file(GLOB_RECURSE COPAL_CPP ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
-add_library(copal ${COPAL_CPP})
-
 file(GLOB_RECURSE BENCHMARK_CPP ${CMAKE_CURRENT_LIST_DIR}/benchmark/*.cpp)
 add_executable(benchmark ${BENCHMARK_CPP})
-target_link_libraries(benchmark PRIVATE copal benchmark::benchmark profiler)
+target_include_directories(benchmark PRIVATE "include")
+target_link_libraries(benchmark benchmark::benchmark profiler)
 
 file(GLOB_RECURSE TEST_CPP ${CMAKE_CURRENT_LIST_DIR}/*.test.cc)
 add_executable(test ${TEST_CPP})
-target_include_directories(test PRIVATE "test")
-target_link_libraries(test PRIVATE copal GTest::gtest GTest::gtest_main)
+target_include_directories(test PRIVATE "include" "test")
+target_link_libraries(test GTest::gtest GTest::gtest_main)

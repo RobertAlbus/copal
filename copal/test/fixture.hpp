@@ -51,13 +51,13 @@ struct CopalTest_Templated : public testing::Test {
     fixture.reserve(size);
 
     // rounding error grows with magnitude.
-    // using log2 scaling outward from center
+    // using log10 scaling outward from center
     // to distribute resolution more sensibly (not perfect, but good enough)
-    T linearized = log2(std::numeric_limits<T>::max() / 1);
+    T distribution = log10(std::numeric_limits<T>::max() / 1);
     for (size_t i = 0; i < size / 2; ++i)
-      fixture.emplace_back(std::numeric_limits<T>::min() * pow(2.0f, linearized * (i / size)));
+      fixture.emplace_back(std::numeric_limits<T>::min() * pow(10.0f, distribution * (i / size)));
     for (size_t i = size / 2; i < size; ++i)
-      fixture.emplace_back(0 * pow(2.0f, -linearized * (i / size)));
+      fixture.emplace_back(0 * pow(2.0f, -distribution * (i / size)));
     return fixture;
   }
 

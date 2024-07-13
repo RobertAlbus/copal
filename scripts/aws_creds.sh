@@ -1,1 +1,0 @@
-eval "$(aws configure export-credentials --profile default --format env)"

@@ -1,4 +1,7 @@
-source /scripts/202-dependency-variables.sh
+#!/bin/sh
+set -euxo pipefail
+
+source /scripts/_dependency_settings.env
 
 # --------------------------------
 # PREFETCH SOURCES
@@ -9,7 +12,7 @@ REPO=$PORTAUDIO_REPO
 
 git clone --branch $TAG --depth 10 $REPO $SRC_DIR/$NAME
 cd $SRC_DIR/$NAME
-git checkout 18a606e1f928852bfc29639d9539ae74d37b5dee
+git checkout $PORTAUDIO_COMMIT
 cd /
 
 # ----

@@ -22,14 +22,14 @@ TYPED_TEST(CopalTest_Templated, fabs) {
   std::vector<Float> inputs = this->fixture_min_max();
 
   if constexpr (std::is_floating_point_v<T>) {
-    for (size_t i; i < inputs.size(); ++i) {
+    for (size_t i = 0; i < inputs.size(); ++i) {
       EXPECT_EQ(mathlib::fabs(inputs[i]), std::fabs(inputs[i]));
     }
   } else if constexpr (stdx::is_simd_v<T>) {
-    for (size_t i; i < inputs.size(); i += T::size()) {
+    for (size_t i = 0; i < inputs.size(); i += T::size()) {
       T input_chunk(&inputs[i], stdx::element_aligned);
       T result = mathlib::fabs(input_chunk);
-      for (size_t j; j < T::size(); ++j) {
+      for (size_t j = 0; j < T::size(); ++j) {
         EXPECT_EQ(result[j], std::fabs(inputs[i+j]));
       }
     }
@@ -44,7 +44,7 @@ TYPED_TEST(CopalTest_Templated, fmod) {
   std::vector<Float> inputs = this->fixture_min_max();
 
   if constexpr (std::is_floating_point_v<T>) {
-    for (size_t i; i < inputs.size(); ++i) {
+    for (size_t i = 0; i < inputs.size(); ++i) {
       for (size_t j = 0; j < inputs.size(); ++j) {
         T a = inputs[i];
         T b = inputs[j];
@@ -58,7 +58,7 @@ TYPED_TEST(CopalTest_Templated, fmod) {
       }
     }
   } else if constexpr (stdx::is_simd_v<T>) {
-    for (size_t i; i < inputs.size(); ++i) {
+    for (size_t i = 0; i < inputs.size(); ++i) {
       // create a uniform vector for each individual value in
       // inputs.
       T a_chunk {inputs[i]};
@@ -86,7 +86,7 @@ TYPED_TEST(CopalTest_Templated, fmod_always_positive) {
   std::vector<Float> inputs = this->fixture_min_max();
 
   if constexpr (std::is_floating_point_v<T>) {
-    for (size_t i; i < inputs.size(); ++i) {
+    for (size_t i = 0; i < inputs.size(); ++i) {
       for (size_t j = 0; j < inputs.size(); ++j) {
         T result   = mathlib::fmod(inputs[i], inputs[j]);
 
@@ -95,7 +95,7 @@ TYPED_TEST(CopalTest_Templated, fmod_always_positive) {
       }
     }
   } else if constexpr (stdx::is_simd_v<T>) {
-    for (size_t i; i < inputs.size(); ++i) {
+    for (size_t i = 0; i < inputs.size(); ++i) {
       // create a uniform vector for each individual value in
       // inputs.
       T a_chunk {inputs[i]};
@@ -132,16 +132,16 @@ TYPED_TEST(CopalTest_Templated, lerp) {
     auto [a, b] = pair;
     for (size_t i = 0; i < inputs.size(); ++i) {
       if constexpr (std::is_floating_point_v<T>) {
-        for (size_t i; i < inputs.size(); ++i) {
+        for (size_t i = 0; i < inputs.size(); ++i) {
           EXPECT_EQ(mathlib::lerp(a, b, inputs[i]), std::lerp(a, b, inputs[i]));
         }
       } else if constexpr (stdx::is_simd_v<T>) {
-        for (size_t i; i < inputs.size(); i += T::size()) {
+        for (size_t i = 0; i < inputs.size(); i += T::size()) {
           T lerp(&inputs[i], stdx::element_aligned);
           T a_chunk(a);
           T b_chunk(b);
           T result = mathlib::lerp(a_chunk, b_chunk, lerp);
-          for (size_t j; j < T::size(); ++j) {
+          for (size_t j = 0; j < T::size(); ++j) {
             EXPECT_EQ(result[j], std::lerp(a, b, inputs[i]));
           }
         }
@@ -191,11 +191,11 @@ TYPED_TEST(CopalTest_Templated, floor) {
   std::vector<Float> inputs = this->fixture_min_max();
 
   if constexpr (std::is_floating_point_v<T>) {
-    for (size_t i; i < inputs.size(); ++i) {
+    for (size_t i = 0; i < inputs.size(); ++i) {
       EXPECT_EQ(mathlib::floor(inputs[i]), std::floor(inputs[i]));
     }
   } else if constexpr (stdx::is_simd_v<T>) {
-    for (size_t i; i < inputs.size(); i += T::size()) {
+    for (size_t i = 0; i < inputs.size(); i += T::size()) {
       T input_chunk(&inputs[i], stdx::element_aligned);
       T result = mathlib::floor(input_chunk);
       for (size_t j = 0; j < T::size(); ++j) {
@@ -391,11 +391,12 @@ TYPED_TEST(CopalTest_Templated, angle_normalization_is_periodic) {
 
         EXPECT_NEAR(x1,  x2, tolerance<Float>::angle_normalization_is_periodic);
 
+        Float zeroProximity = std::abs(0  - x1);
         Float absError      = std::abs(x1 - x2);
-        Float zeroProximity = std::abs(0  - x2);
-        if (zeroProximity > tolerance<Float>::angle_norm_periodic_when_close
-            && absError   > tolerance<Float>::angle_norm_periodic_when_close
-        ) EXPECT_EQ(sign1,  sign2);
+        if (
+            zeroProximity > tolerance<Float>::angle_norm_periodic_when_close_to_zero
+            && absError   > tolerance<Float>::angle_norm_periodic_when_close_in_value
+        ) EXPECT_EQ(sign1, sign2);
       }
     }
   } else if constexpr (stdx::is_simd_v<T>) {
@@ -411,11 +412,12 @@ TYPED_TEST(CopalTest_Templated, angle_normalization_is_periodic) {
         for (size_t j = 0; j < T::size(); ++j) {
           EXPECT_NEAR(x1[j], x2[j], tolerance<Float>::angle_normalization_is_periodic);
 
+          Float zeroProximity = std::abs(0     - x1[j]);
           Float absError      = std::abs(x1[j] - x2[j]);
-          Float zeroProximity = std::abs(0     - x2[j]);
-          if (zeroProximity > tolerance<Float>::angle_norm_periodic_when_close
-              && absError   > tolerance<Float>::angle_norm_periodic_when_close
-          ) EXPECT_EQ(sign1[j],  sign2[j]);
+          if (
+              zeroProximity > tolerance<Float>::angle_norm_periodic_when_close_to_zero
+              && absError   > tolerance<Float>::angle_norm_periodic_when_close_in_value
+          ) EXPECT_EQ(sign1[j], sign2[j]);
         }
       }
     }

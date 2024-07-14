@@ -54,7 +54,7 @@ static void BM_copal_sin_single(benchmark::State& state) {
     randArray<T, testInputSize>(params::min, params::max);
 
   for (auto _ : state) {
-    for(size_t i = 0; i < testInputSize; ++i) {
+    for (size_t i = 0; i < testInputSize; ++i) {
       benchmark::DoNotOptimize(params::exec(x_in[i]));
       benchmark::ClobberMemory();
     }

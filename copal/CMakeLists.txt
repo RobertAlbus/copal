@@ -9,7 +9,7 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(EXTRA_LIB_DIR "" CACHE PATH "Path to the extra lib directory")
 set(EXTRA_INCLUDE_DIR "" CACHE PATH "Path to the extra include directory")
 
-add_compile_options(-O3 -march=native)
+add_compile_options(-march=native)
 
 include_directories(BEFORE SYSTEM ${EXTRA_INCLUDE_DIR})
 include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_LIST_DIR}/include)
@@ -22,10 +22,11 @@ find_package(benchmark REQUIRED CONFIG)
 
 file(GLOB_RECURSE BENCHMARK_CPP ${CMAKE_CURRENT_LIST_DIR}/benchmark/*.cpp)
 add_executable(benchmark ${BENCHMARK_CPP})
+target_compile_options(benchmark PRIVATE -O3)
 target_include_directories(benchmark PRIVATE "include")
 target_link_libraries(benchmark benchmark::benchmark profiler)
 
 file(GLOB_RECURSE TEST_CPP ${CMAKE_CURRENT_LIST_DIR}/*.test.cc)
-add_executable(test ${TEST_CPP})
-target_include_directories(test PRIVATE "include" "test")
-target_link_libraries(test GTest::gtest GTest::gtest_main)
+add_executable(copaltest ${TEST_CPP})
+target_include_directories(copaltest PRIVATE "include" "test")
+target_link_libraries(copaltest GTest::gtest_main)

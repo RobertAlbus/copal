@@ -1,3 +1,4 @@
+```
 2024-07-10T12:02:54-06:00
 Running ./benchmark
 Run on (24 X 3692.97 MHz CPU s)
@@ -150,3 +151,4 @@ BM_copal_sin_simd<bm_simd_sin_params<double,  2, 1, copal::VectorStdx<double>::s
 BM_copal_sin_simd<bm_simd_sin_params<double,  4, 1, copal::VectorStdx<double>::sin_stdlib>>      888849 ns       886403 ns         788
 BM_copal_sin_simd<bm_simd_sin_params<double,  8, 1, copal::VectorStdx<double>::sin_stdlib>>      891544 ns       889040 ns         796
 BM_copal_sin_simd<bm_simd_sin_params<double, 16, 1, copal::VectorStdx<double>::sin_stdlib>>      883481 ns       881015 ns         796
+```

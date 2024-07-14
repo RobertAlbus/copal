@@ -23,19 +23,17 @@
 
 template <std::floating_point T>
 struct tolerance {
-  static constexpr T fmod = 10e5 * std::numeric_limits<T>::epsilon();
-  static constexpr T angle_normalization_is_symmetrical_x_2 = 1.2e-7;
-  static constexpr T angle_normalization_is_symmetrical_x_3 = 2.4e-7;
-  static constexpr T angle_normalization_is_symmetrical_x_4 = 2.4e-7;
-  static constexpr T simd_angle_normalization_is_symmetrical_x_2 = 1.2e-7;
-  static constexpr T simd_angle_normalization_is_symmetrical_x_3 = std::is_same_v<T, float> ? 3.9e-4 : 2.4e-7; // boo :(
-  static constexpr T simd_angle_normalization_is_symmetrical_x_4 = std::is_same_v<T, float> ? 3.9e-4 : 2.4e-7; // boo :(
-  static constexpr T angle_normalization_is_periodic        = 7.0e-6;
-  static constexpr T angle_norm_periodic_when_close = std::is_same_v<T, float> ? 1.5e-06 : 1.5e-16;
-  static constexpr T sin_lookup_float                       = 2.4e-7;
-  static constexpr T sin_lookup_double                      = 1.4e-7;
-  static constexpr T sin_taylor_float                       = 1.8e-7;
-  static constexpr T sin_taylor_double                      = 1.0e-7;
+  static constexpr T angle_normalization_is_symmetrical_x_2      = std::is_same_v<T, float> ? 1.2e-7 : 1e-15;
+  static constexpr T angle_normalization_is_symmetrical_x_3      = std::is_same_v<T, float> ? 2.4e-7 : 1e-15;
+  static constexpr T angle_normalization_is_symmetrical_x_4      = std::is_same_v<T, float> ? 2.4e-7 : 1e-15;
+  static constexpr T simd_angle_normalization_is_symmetrical_x_2 = std::is_same_v<T, float> ? 1.2e-7 : 1e-15;
+  static constexpr T simd_angle_normalization_is_symmetrical_x_3 = std::is_same_v<T, float> ? 3.9e-4 : 1e-15; // float: booooo
+  static constexpr T simd_angle_normalization_is_symmetrical_x_4 = std::is_same_v<T, float> ? 3.9e-4 : 1e-15; // float: booooo
+  static constexpr T angle_normalization_is_periodic             = std::is_same_v<T, float> ? 7.0e-6 : 1e-14;
+  static constexpr T angle_norm_periodic_when_close_to_zero      = std::is_same_v<T, float> ? 0.0f : 4.5e-16;
+  static constexpr T angle_norm_periodic_when_close_in_value     = std::is_same_v<T, float> ? 0.0f : 1.5e-16;
+  static constexpr T sin_lookup                                  = std::is_same_v<T, float> ? 1.5e-45f : 2.5e-312;
+  static constexpr T sin_lookup_simd                             = 1.9e-07;
 };
 
 template <copal::CopalMath Impl>

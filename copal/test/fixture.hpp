@@ -11,14 +11,14 @@
 #include <gtest/gtest.h>
 
 
-#include "math_concept.hpp"
-#include "scalar.hpp"
-#include "stdlib.hpp"
-#include "vector_impl.hpp"
-#include "vector_stdx.hpp"
+#include "copal/math_concept.hpp"
+#include "copal/scalar.hpp"
+#include "copal/stdlib.hpp"
+#include "copal/vector_impl.hpp"
+#include "copal/vector_stdx.hpp"
 
-#include "stdx_definition.hpp"
-#include "num.hpp"
+#include "copal/stdx_definition.hpp"
+#include "copal/num.hpp"
 
 
 template <std::floating_point T>

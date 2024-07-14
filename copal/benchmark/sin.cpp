@@ -1,4 +1,3 @@
-// #include "vector_impl/sin.hpp"
 #include <array>
 #include <concepts>
 #include <experimental/simd>
@@ -12,11 +11,11 @@
 
 // ----
 // headers
-#include "vector_impl.hpp"
-#include "vector_stdx.hpp"
-#include "scalar.hpp"
-#include "stdlib.hpp"
-#include "stdx_definition.hpp"
+#include "copal/vector_impl.hpp"
+#include "copal/vector_stdx.hpp"
+#include "copal/scalar.hpp"
+#include "copal/stdlib.hpp"
+#include "copal/stdx_definition.hpp"
 
 
 // ----

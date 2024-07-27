@@ -5,7 +5,9 @@
 
 FROM cpp_base AS cpp_build_env
 
-RUN apk update && apk upgrade --available
-RUN apk add --no-cache clang18 git cmake make sccache jack
+RUN pacman -Syyu --noconfirm
+RUN pacman -S --noconfirm base-devel
+RUN pacman -S --noconfirm clang cmake make git
+RUN pacman -S --noconfirm sccache gperftools
 
-ENV CXX "clang++-18"
+ENV CXX="clang++"

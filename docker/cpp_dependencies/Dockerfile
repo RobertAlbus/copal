@@ -2,6 +2,7 @@
 # BUILD cpp_build_dependencies
 
 FROM cpp_build_env AS cpp_build_dependencies
+SHELL ["/bin/bash", "-c"]
 
             # --------------------------------
             ARG USE_SCCACHE
@@ -25,9 +26,6 @@ COPY scripts/20-build-dependencies.sh /scripts/
 COPY scripts/build_dependencies.sh /scripts
 RUN chmod +x -R /scripts
 
-RUN ls /scripts
-
-
 RUN ./scripts/10-clone-dependencies.sh
 
 RUN --mount=type=secret,id=AWS_ACCESS_KEY_ID \
@@ -41,7 +39,7 @@ RUN --mount=type=secret,id=AWS_ACCESS_KEY_ID \
 
 # --------------------------------
 # BUILT DEPENDENCIES
-FROM cpp_base AS cpp_built_dependencies
+FROM alpine:latest AS cpp_built_dependencies
 
 COPY scripts/export-dependencies.sh /scripts/
 COPY scripts/_dependency_settings.env /scripts/

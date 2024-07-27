@@ -1,4 +1,4 @@
-```
+```md
 2024-07-10T12:02:54-06:00
 Running ./benchmark
 Run on (24 X 3692.97 MHz CPU s)

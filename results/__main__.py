@@ -1,37 +1,20 @@
 import sys
-from typing import List, Optional
+from typing import List
+
+from lib import Table
 
 
-# python __main__.py $(pwd)/2024-07-28-115600.md
+# python __main__.py $(pwd)/2024-07-10-optimized.md
 
 
-class BenchmarkHeading:
-    def __init__(self):
-        self.instruction_type = "instruction type"
-        self.precision = "precision"
-        self.test_range = "test range"
-        self.implementation_class = "class"
-        self.method = "method"
-        self.time = "cpu time"
-    
-    def to_list(self) -> List[str]:
-        return [
-            self.implementation_class,
-            self.method,
-            self.instruction_type,
-            self.test_range,
-            self.precision,
-            self.time
-        ]
-
-    def to_markdown(self, column_widths: List[int] = [0,0,0,0,0,0]) -> str:
-        delim = "|"
-        return (
-            delim.join([f" {field.ljust(column_widths[i])} " for i, field in enumerate(self.to_list())])
-            + "\n"
-            + delim.join(["-" * (width + 2) for width in column_widths])
-        )
-
+standard_header = [
+    "instruction type",
+    "precision",
+    "test range",
+    "class",
+    "method",
+    "cpu time",
+]
 
 class BenchmarkResult:
     def __init__(self, instruction_type: str, precision: str, test_range_string: str,
@@ -71,7 +54,7 @@ def parse_benchmark_result(line: str) -> BenchmarkResult:
         test_range_string = f"± {parts[1]} pi"
         test_range_value = float(parts[1])
     else:
-        test_range_string = f"+/- {parts[1]}/{parts[2]} pi"
+        test_range_string = f"± {parts[1]}/{parts[2]} pi"
         test_range_value = float(parts[1]) / float(parts[2])
 
     implementation_class = parts[3].split('<')[0]
@@ -89,23 +72,7 @@ def parse_benchmark_result(line: str) -> BenchmarkResult:
         time_unit
     )
 
-def measure_column_widths(benchmark_heading_titles: List[str], benchmark_results: List[BenchmarkResult]) -> List[int]:
-    assert len(benchmark_heading_titles) > 0, "No benchmark heading titles provided"
-    assert len(benchmark_results) > 0, "No benchmark results provided"
-
-    num_heading_columns = len(benchmark_heading_titles)
-    column_widths = [len(title) for title in benchmark_heading_titles]
-
-    for benchmark_result in benchmark_results:
-        fields = benchmark_result.to_list()
-        assert num_heading_columns == len(fields), "BenchmarkHeading and BenchmarkResult must have same number of columns"
-        for i, field in enumerate(fields):
-            column_widths[i] = len(field) if len(field) > column_widths[i] else column_widths[i]
-
-    return column_widths
-
 def main(file_path: str):
-    heading = BenchmarkHeading()
     results: List[BenchmarkResult] = []
     with open(file_path, 'r') as file:
         for line in file:
@@ -113,12 +80,13 @@ def main(file_path: str):
                 result = parse_benchmark_result(line)
                 results.append(result)
 
-    column_widths = measure_column_widths(heading.to_list(), results)
+    table = Table(
+        table_data=[standard_header] + [result.to_list() for result in results],
+        has_titles=True
+    )
 
     with open('table-all.md', 'w') as md_file:
-        md_file.write(f"{heading.to_markdown(column_widths)}\n")
-        for result in results:
-            md_file.write(result.to_markdown(column_widths) + '\n')
+        md_file.write(table.to_markdown())
 
 if __name__ == "__main__":
     main(sys.argv[1])

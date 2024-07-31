@@ -61,11 +61,6 @@ class BenchmarkResult:
 
 def parse_benchmark_result(line: str) -> BenchmarkResult:
     parts = line.split()
-    print(f"\n{line.split("\n")[0]}")
-    i = 0
-    for part in parts:
-        print(f"  [%i] - %s" % (i, part))
-        i += 1
 
     instruction_type = "simd" if "simd" in parts[0] else "scalar"
     precision = "double" if "double" in parts[1] else "float"

@@ -20,7 +20,7 @@
 
 // ----
 // fixtures
-const size_t testInputSize = 2048;
+const size_t testInputSize = 1000000;
 
 template<std::floating_point T, std::size_t size>
 std::array<T, size> randArray(T lowest, T highest) {

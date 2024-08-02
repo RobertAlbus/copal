@@ -1,29 +1,38 @@
+import json
 import sys
+
 from typing import List
 
 from lib import Table, BenchmarkResult
 
 
-# python __main__.py $(pwd)/2024-07-10-optimized.md
-
+# python __main__.py $(pwd)/2024-08-01-201100.json
 
 standard_header = [
-    "instruction type",
-    "precision",
-    "test range",
+    "variant",
+    "type",
     "class",
     "method",
+    "test range",
     "cpu time",
 ]
 
 def main(file_path: str):
     results: List[BenchmarkResult] = []
     with open(file_path, 'r') as file:
-        for line in file:
-            if "BM_copal_sin" in line:
+        if ".json" in file_path:
+            data = json.load(file)
+            benchmarks = data['benchmarks']
+            for benchmark in benchmarks:
                 results.append(
-                    BenchmarkResult.from_console_string(line)
+                    BenchmarkResult.from_json(benchmark)
                 )
+        else:
+            for line in file:
+                if "BM_copal_sin" in line:
+                    results.append(
+                        BenchmarkResult.from_console_string(line)
+                    )
 
     table = Table(
         table_data=[standard_header] + [result.to_list() for result in results],

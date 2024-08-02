@@ -1,6 +1,8 @@
 #!/bin/bash
 set -exo pipefail
 
+BUILD_DIR="${BUILD_DIR:-build}"
+
 check_missing_vars() {
   local required_vars="$@"
   local missing_vars=""
@@ -44,16 +46,22 @@ fi
 
 # ----------------------------------------------------------------
 # BUILD
-mkdir -p build
-cd build
+rm -fr bin
+mkdir -p bin
+
+mkdir -p "$BUILD_DIR"
+cd "$BUILD_DIR"
 cmake .. \
   -DEXTRA_LIB_DIR=../../dependencies/lib \
   -DEXTRA_INCLUDE_DIR=../../dependencies/include\
   -DCMAKE_CXX_COMPILER=clang++
 
 make -j
-cd ..
 
+cp copaltest ../bin
+cp benchmark ../bin
+
+cd ..
 
 # ----------------------------------------------------------------
 # STOP SCCACHE

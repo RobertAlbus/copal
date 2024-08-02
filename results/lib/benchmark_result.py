@@ -74,7 +74,3 @@ class BenchmarkResult:
             self.test_range_string,
             f"{str(self.time)} {self.time_unit}"
         ]
-
-    def to_markdown(self, column_widths: List[int] = [0,0,0,0,0,0]) -> str:
-        delim = "|"
-        return delim.join([f" {field.ljust(column_widths[i])} " for i, field in enumerate(self.to_list())])

@@ -47,7 +47,7 @@ struct bm_scalar_sin_params {
 };
 
 template<typename params>
-static void BM_copal_sin_single(benchmark::State& state) {
+static void BM_sin_scalar(benchmark::State& state) {
   using T = params::Type;
   std::array<T, testInputSize> x_in =
     randArray<T, testInputSize>(params::min, params::max);
@@ -73,7 +73,7 @@ struct bm_simd_sin_params {
 };
 
 template<typename params>
-static void BM_copal_sin_simd(benchmark::State& state) {
+static void BM_sin_simd(benchmark::State& state) {
   using T = typename params::Type;
   alignas(stdx::memory_alignment_v<stdx::native_simd<T>>)
     std::array<T, testInputSize> x_in =
@@ -95,26 +95,26 @@ BENCHMARK(bm_func<type_params<type_float,   4, impl_class<type_float>::impl_meth
 BENCHMARK(bm_func<type_params<type_float,  40, impl_class<type_float>::impl_method>>);\
 BENCHMARK(bm_func<type_params<type_float, 400, impl_class<type_float>::impl_method>>);
 
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, float, copal::Scalar,     sin_lookup);
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, float, copal::Scalar,     sin_taylor)
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, float, copal::Stdlib,     sin_lookup)
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, float, copal::Stdlib,     sin_taylor)
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, float, copal::Stdlib,     sin_stdlib)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, float, copal::Scalar,     sin_lookup);
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, float, copal::Scalar,     sin_taylor)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, float, copal::Stdlib,     sin_lookup)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, float, copal::Stdlib,     sin_taylor)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, float, copal::Stdlib,     sin_stdlib)
 
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   float, copal::VectorImpl, sin_lookup);
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   float, copal::VectorImpl, sin_taylor)
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   float, copal::VectorStdx, sin_lookup)
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   float, copal::VectorStdx, sin_taylor)
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   float, copal::VectorStdx, sin_stdlib)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   float, copal::VectorImpl, sin_lookup);
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   float, copal::VectorImpl, sin_taylor)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   float, copal::VectorStdx, sin_lookup)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   float, copal::VectorStdx, sin_taylor)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   float, copal::VectorStdx, sin_stdlib)
 
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, double, copal::Scalar,     sin_lookup);
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, double, copal::Scalar,     sin_taylor)
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, double, copal::Stdlib,     sin_lookup)
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, double, copal::Stdlib,     sin_taylor)
-bm_declare_set(BM_copal_sin_single, bm_scalar_sin_params, double, copal::Stdlib,     sin_stdlib)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, double, copal::Scalar,     sin_lookup);
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, double, copal::Scalar,     sin_taylor)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, double, copal::Stdlib,     sin_lookup)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, double, copal::Stdlib,     sin_taylor)
+bm_declare_set(BM_sin_scalar, bm_scalar_sin_params, double, copal::Stdlib,     sin_stdlib)
 
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   double, copal::VectorImpl, sin_lookup);
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   double, copal::VectorImpl, sin_taylor)
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   double, copal::VectorStdx, sin_lookup)
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   double, copal::VectorStdx, sin_taylor)
-bm_declare_set(BM_copal_sin_simd,   bm_simd_sin_params,   double, copal::VectorStdx, sin_stdlib)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   double, copal::VectorImpl, sin_lookup);
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   double, copal::VectorImpl, sin_taylor)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   double, copal::VectorStdx, sin_lookup)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   double, copal::VectorStdx, sin_taylor)
+bm_declare_set(BM_sin_simd,   bm_simd_sin_params,   double, copal::VectorStdx, sin_stdlib)

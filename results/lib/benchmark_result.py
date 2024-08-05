@@ -33,7 +33,7 @@ class BenchmarkResult:
     def from_json(json) -> BenchmarkResult:
         benchmark_result = BenchmarkResult._details_from_name_string(json['name'])
 
-        benchmark_result.time = int(json['cpu_time'])
+        benchmark_result.time = int(json['real_time'])
         benchmark_result.time_unit = json['time_unit']
 
         return benchmark_result

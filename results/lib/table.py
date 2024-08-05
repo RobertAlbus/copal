@@ -48,3 +48,22 @@ class Table:
                 self._column_widths[i] = size if size > self._column_widths[i] else self._column_widths[i]
         
         # self._column_widths = [x + 2 for x in self._column_widths]
+
+class TableHeader:
+    VARIANT              = "variant"
+    PRECISION            = "type"
+    IMPLEMENTATION_CLASS = "class"
+    METHOD               = "method"
+    TEST_RANGE           = "test range"
+    CPU_TIME             = "cpu time"
+
+    @staticmethod
+    def standard() -> List[str]:
+        return [
+            TableHeader.VARIANT,
+            TableHeader.PRECISION,
+            TableHeader.IMPLEMENTATION_CLASS,
+            TableHeader.METHOD,
+            TableHeader.TEST_RANGE,
+            TableHeader.CPU_TIME,
+        ]

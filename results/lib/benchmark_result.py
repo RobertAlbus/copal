@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+
 import re
 
 from typing import List
@@ -17,6 +17,19 @@ class BenchmarkResult:
         self.time_unit = time_unit
     
     @staticmethod
+    def copy_from(benchmark_result: BenchmarkResult):
+        return BenchmarkResult(
+            benchmark_result.instruction_type, 
+            benchmark_result.precision, 
+            benchmark_result.test_range_string, 
+            benchmark_result.test_range_value, 
+            benchmark_result.implementation_class, 
+            benchmark_result.method, 
+            benchmark_result.time, 
+            benchmark_result.time_unit, 
+    )
+    
+    @staticmethod
     def from_json(json) -> BenchmarkResult:
         benchmark_result = BenchmarkResult._details_from_name_string(json['name'])
 
@@ -29,7 +42,6 @@ class BenchmarkResult:
     def from_console_string(line: str) -> BenchmarkResult:
         match = re.search(r'^.*?>>', line)
         assert match is not None, f"Could not parse console line: \n{line}\n"
-
 
         benchmark_result = BenchmarkResult._details_from_name_string(match.group())
 

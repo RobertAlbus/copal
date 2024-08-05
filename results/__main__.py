@@ -32,7 +32,8 @@ def main(file_path: str):
         md_file.write(
             Table(
                 table_data=[TableHeader.standard()] + [benchmark.to_list() for benchmark in benchmarks],
-                has_titles=True
+                has_titles=True,
+                alignments="LLLLRR"
             ).to_markdown()
         )
 
@@ -40,7 +41,6 @@ def main(file_path: str):
     benchmark_sort_by_time(aggregated_benchmarks)
 
     column_test_range = TableHeader.standard().index(TableHeader.TEST_RANGE)
-    column_precision = TableHeader.standard().index(TableHeader.PRECISION)
 
     ## median speed: [scalar, SIMD] [float, double]
     median_speed_table_data = [TableHeader.standard()] + [benchmark.to_list() for benchmark in aggregated_benchmarks]
@@ -101,47 +101,83 @@ def main(file_path: str):
         md_file.write("# Ranked by Median Speed")
         md_file.write("\n\n## [scalar, SIMD] [float, double] Benchmarks\n")
         md_file.write(
-            Table(table_data=median_speed_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=median_speed_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## [scalar, SIMD] float Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_float_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_float_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## [scalar, SIMD] double Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_double_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_double_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## scalar [float, double] Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_scalar_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_scalar_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## scalar float Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_scalar_float_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_scalar_float_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## scalar double Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_scalar_double_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_scalar_double_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## SIMD [float, double] Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_simd_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_simd_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## SIMD float Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_simd_float_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_simd_float_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
         md_file.write("\n\n## SIMD double Benchmarks\n")
         md_file.write(
-            Table(table_data=aggregated_benchmarks_simd_double_table_data, has_titles=True).to_markdown()
+            Table(
+                table_data=aggregated_benchmarks_simd_double_table_data,
+                has_titles=True,
+                alignments="LLLLR"
+            ).to_markdown()
         )
 
     # results_ranked_speed_by_input_range = {}
